@@ -27,17 +27,13 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
 
     const workout = useWorkoutBySlug(route.params.slug);
 
-    const countDown = useCountDown(
-        trackerIdx,
-        trackerIdx >= 0 ? sequence[trackerIdx].duration : -1
+    const { countDown, isRunning, stop, start } = useCountDown(
+        trackerIdx
     )
-
 
     useEffect(() => {
         if (!workout) { return; }
-
         if (trackerIdx === workout.sequence.length - 1) { return; }
-
         if (countDown === 0) {
             addItemToSequence(trackerIdx + 1)
         }
@@ -45,11 +41,17 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
 
 
     const addItemToSequence = (idx: number) => {
-        setSequence([...sequence, workout!.sequence[idx]])
+        let newSequence = [];
+
+        if(idx > 0){
+            newSequence = ([...sequence, workout!.sequence[idx]])
+        }else{
+            newSequence = [workout!.sequence[idx]];
+        }
+        setSequence(newSequence)
         setTrackerIdx(idx)
+        start(newSequence[idx].duration);
     }
-
-
 
     if (!workout) {
         return null;
@@ -92,7 +94,7 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
                 </Modal>
             </WorkoutItem>
             <View style={styles.centerView}>
-                {sequence.length === 0 &&
+                {sequence.length === 0 ?
                     <FontAwesome
                         name="play-circle-o"
                         size={100}
@@ -101,7 +103,33 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
                             marginVertical: 20,
                         }}
                         onPress={() => addItemToSequence(0)}
+                    />:
+                    isRunning ? 
+                    <FontAwesome
+                        name="stop-circle-o"
+                        size={100}
+                        color="#2563eb"
+                        style={{
+                            marginVertical: 20,
+                        }}
+                        onPress={() => stop()}
+                    />:
+                    <FontAwesome
+                        name="play-circle-o"
+                        size={100}
+                        color="#2563eb"
+                        style={{
+                            marginVertical: 20,
+                        }}
+                        onPress={() => {
+                            if(hasReachedEnd){
+                                addItemToSequence(0)
+                            }else{
+                            start(countDown)}
+                            }
+                        }
                     />
+
                 }
                 {sequence.length > 0 && countDown >= 0 &&
                     <View>

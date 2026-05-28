@@ -1,34 +1,33 @@
-import { useState, useEffect, useRef} from "react";
-
-
-
+import { useState, useEffect, useRef } from "react";
 
 export function useCountDown(
     idx: number,
-    initialCount: number
-){
-    const intervalRef =  useRef<number | undefined>(undefined);
+    initialCount: number = -1
+) {
+    const intervalRef = useRef<number | undefined>(undefined);
     const [countDown, setCountDown] = useState(initialCount);
+    const [isRunning, setIsRunning] = useState(false);
 
     useEffect(() => {
-        if(idx == -1) { return; }
+        if (idx == -1) { return; }
 
-        intervalRef.current = window.setInterval(() => {
-            setCountDown((count) => {
-                return count - 1;
-            })
-        }, 1000)
+        if (isRunning && !intervalRef.current) {
+            intervalRef.current = window.setInterval(() => {
+                setCountDown((count) => {
+                    return count - 1;
+                })
+            }, 10)
+        }
         return cleanup;
+    }, [idx, isRunning])
 
-    }, [idx])
 
-
-    useEffect (() => {
+    useEffect(() => {
         setCountDown(initialCount);
     }, [initialCount])
 
-    useEffect(() =>{
-        if (countDown === 0) { 
+    useEffect(() => {
+        if (countDown === 0) {
             cleanup();
         }
 
@@ -37,12 +36,20 @@ export function useCountDown(
 
     const cleanup = () => {
         if (intervalRef.current) {
-            
-        window.clearInterval(intervalRef.current)
-        intervalRef.current = undefined
+            setIsRunning(false);
+            window.clearInterval(intervalRef.current)
+            intervalRef.current = undefined
         }
     }
 
 
-    return countDown;
+    return {
+        countDown,
+        isRunning,
+        stop: cleanup,
+        start: (count?:number) => {
+            setCountDown(count ?? initialCount);
+            setIsRunning(true);
+        }
+    };
 }
