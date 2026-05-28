@@ -27,6 +27,7 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
 
     const workout = useWorkoutBySlug(route.params.slug);
 
+    const startupSeq = ["1", "2", "3", "Go"].reverse();
     const { countDown, isRunning, stop, start } = useCountDown(
         trackerIdx
     )
@@ -50,7 +51,7 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
         }
         setSequence(newSequence)
         setTrackerIdx(idx)
-        start(newSequence[idx].duration);
+        start(newSequence[idx].duration + startupSeq.length);
     }
 
     if (!workout) {
@@ -134,7 +135,11 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
                 {sequence.length > 0 && countDown >= 0 &&
                     <View>
                         <Text style={styles.countdownText}>
-                            {countDown}
+                            {
+                                countDown > sequence[trackerIdx].duration ?
+                                startupSeq[countDown - sequence[trackerIdx].duration - 1]:
+                                countDown
+                            }
                         </Text>
                     </View>
                 }
