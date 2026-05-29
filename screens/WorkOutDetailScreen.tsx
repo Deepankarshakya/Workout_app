@@ -27,7 +27,7 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
 
     const workout = useWorkoutBySlug(route.params.slug);
 
-    const startupSeq = ["1", "2", "3", "Go"].reverse();
+    const startupSeq = ["3", "2", "1", "Go"].reverse();
     const { countDown, isRunning, stop, start } = useCountDown(
         trackerIdx
     )
