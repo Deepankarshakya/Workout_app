@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
+import { useForm, Controller } from "react-hook-form";
 import { PressableText } from "./styled/Pressable";
 
 export type ExerciseForm = {
@@ -15,19 +16,9 @@ type WorkoutProps = {
 
 export default function WorkOutForm({
     onSubmit
-}:WorkoutProps) {
+}: WorkoutProps) {
 
-    const [form, setForm] = useState({
-        name: "",
-        duration: ""
-    })
-
-    const onChangeText = (name: string) => (text: String) => {
-        setForm({
-            ...form,
-            [name]: text
-        })
-    }
+    const { control, handleSubmit } = useForm();
 
     return (
         <View style={styles.container}>
@@ -35,19 +26,42 @@ export default function WorkOutForm({
                 Exercise Form
             </Text>
             <View>
-                <TextInput
-                onChangeText={onChangeText("name")}
-                value={form.name}
-                style={styles.input}
+                <Controller
+                    control={control}
+                    rules={{
+                        required: true
+                    }}
+                    name="name"
+                    render={({ field: { onChange, value } }) =>
+                        <TextInput
+                            onChangeText={onChange}
+                            value={value}
+                            style={styles.input}
+                            placeholder="Name"
+                        />
+                    }
                 />
-                <TextInput
-                onChangeText={onChangeText("duration")}
-                value={form.duration}
-                style={styles.input}
+
+                <Controller
+                    control={control}
+                    rules={{
+                        required: true
+                    }}
+                    name="duration"
+                    render={({ field: { onChange, value } }) =>
+                        <TextInput
+                            onChangeText={onChange}
+                            value={value}
+                            style={styles.input}
+                            placeholder="Duration"
+                        />
+                    }
                 />
                 <PressableText 
                     text="Submit"
-                    onPress={() => onSubmit(form)}
+                    onPress={handleSubmit((data) => {
+                        onSubmit(data as ExerciseForm);
+                    })}
                 />
             </View>
         </View>
