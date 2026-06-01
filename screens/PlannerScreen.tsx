@@ -29,6 +29,9 @@ export default function PlannerScreen({navigation}: any){
 
     return(
         <View style={styles.container}>
+
+            <ExerciseForm 
+            onSubmit={handelFormSbmit}/>
             <FlatList
             data={seqItems}
             renderItem={({item, index}) =>
@@ -46,9 +49,6 @@ export default function PlannerScreen({navigation}: any){
             }
             keyExtractor={item => item.slug}
             />
-            <ExerciseForm 
-            onSubmit={handelFormSbmit}/>
-
         </View>
     )
 }
