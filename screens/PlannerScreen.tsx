@@ -1,18 +1,54 @@
 import {View, StyleSheet} from 'react-native';
-import WorkOutForm, { ExerciseForm } from '../components/WorkOutForm';
+import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
+import { SequenceItems, SequenceType } from '../types/data';
+import slugify from "@sindresorhus/slugify"
+import { useState } from 'react';
+import { FlatList } from 'react-native-gesture-handler';
+import ExerciseItem from '../components/ExerciseItem';
+import { PressableTextClose } from '../components/styled/pressableclose';
 
 export default function PlannerScreen({navigation}: any){
+    const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
 
 
-    const handelFormSbmit = (form: ExerciseForm) => {
-        alert(`${form.name} - ${form.duration} - ${form.reps} - ${form.type}`)
+    const handelFormSbmit = (form: ExerciseFormData) => {
+        const sequenceItem: SequenceItems ={
+            slug: slugify(form.name + " " + Date.now(), {lowercase:true}),
+            name: form.name,
+            type: form.type as SequenceType,
+            duration : Number(form.duration)
+        };
+
+        if(form.reps){
+            sequenceItem.reps=Number(form.reps)
+        }
+
+        setSeqItems([...seqItems, sequenceItem]);
     }
 
 
     return(
         <View style={styles.container}>
-            <WorkOutForm 
+            <FlatList
+            data={seqItems}
+            renderItem={({item, index}) =>
+                <ExerciseItem item={item}>
+                    <PressableTextClose 
+                        text="Remove"
+                        onPressIn={() => {
+                            const items = [...seqItems]
+                            items.splice(index, 1);
+                            setSeqItems(items)
+
+                        }}
+                    />
+                </ExerciseItem>
+            }
+            keyExtractor={item => item.slug}
+            />
+            <ExerciseForm 
             onSubmit={handelFormSbmit}/>
+
         </View>
     )
 }
