@@ -1,17 +1,29 @@
 import {View, StyleSheet} from 'react-native';
-import WorkOutForm, { ExerciseForm } from '../components/WorkOutForm';
+import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
+import { SequenceItems, SequenceType } from '../types/data';
 
 export default function PlannerScreen({navigation}: any){
 
 
-    const handelFormSbmit = (form: ExerciseForm) => {
-        alert(`${form.name} - ${form.duration} - ${form.reps} - ${form.type}`)
+    const handelFormSbmit = (form: ExerciseFormData) => {
+        const sequenceItem: SequenceItems ={
+            slug: form.name + Date.now(),
+            name: form.name,
+            type: form.type as SequenceType,
+            duration : Number(form.duration)
+        };
+
+        if(form.reps){
+            sequenceItem.reps=Number(form.reps)
+        }
+
+        console.log(sequenceItem);
     }
 
 
     return(
         <View style={styles.container}>
-            <WorkOutForm 
+            <ExerciseForm 
             onSubmit={handelFormSbmit}/>
         </View>
     )
