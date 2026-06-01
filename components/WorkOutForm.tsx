@@ -5,7 +5,9 @@ import { PressableText } from "./styled/Pressable";
 
 export type ExerciseForm = {
     name: string,
-    duration: string
+    duration: string,
+    type: string,
+    reps?: number
 }
 
 
@@ -26,38 +28,70 @@ export default function WorkOutForm({
                 Exercise Form
             </Text>
             <View>
-                <Controller
-                    control={control}
-                    rules={{
-                        required: true
-                    }}
-                    name="name"
-                    render={({ field: { onChange, value } }) =>
-                        <TextInput
-                            onChangeText={onChange}
-                            value={value}
-                            style={styles.input}
-                            placeholder="Name"
-                        />
-                    }
-                />
+                <View style={styles.rowContainer}>
+                    <Controller
+                        control={control}
+                        rules={{
+                            required: true
+                        }}
+                        name="name"
+                        render={({ field: { onChange, value } }) =>
+                            <TextInput
+                                onChangeText={onChange}
+                                value={value}
+                                style={styles.input}
+                                placeholder="Name"
+                            />
+                        }
+                    />
 
-                <Controller
-                    control={control}
-                    rules={{
-                        required: true
-                    }}
-                    name="duration"
-                    render={({ field: { onChange, value } }) =>
-                        <TextInput
-                            onChangeText={onChange}
-                            value={value}
-                            style={styles.input}
-                            placeholder="Duration"
-                        />
-                    }
-                />
-                <PressableText 
+                    <Controller
+                        control={control}
+                        rules={{
+                            required: true
+                        }}
+                        name="duration"
+                        render={({ field: { onChange, value } }) =>
+                            <TextInput
+                                onChangeText={onChange}
+                                value={value}
+                                style={styles.input}
+                                placeholder="Duration"
+                            />
+                        }
+                    />
+                </View>
+                <View style={styles.rowContainer}>
+                    <Controller
+                        control={control}
+                        name="reps"
+                        render={({ field: { onChange, value } }) =>
+                            <TextInput
+                                onChangeText={onChange}
+                                value={value}
+                                style={styles.input}
+                                placeholder="Repetation"
+                            />
+                        }
+                    />
+
+                    <Controller
+                        control={control}
+                        rules={{
+                            required: true
+                        }}
+                        name="type"
+                        render={({ field: { onChange, value } }) =>
+                            <TextInput
+                                onChangeText={onChange}
+                                value={value}
+                                style={styles.input}
+                                placeholder="Types"
+                            />
+                        }
+                    />
+                </View>
+                <PressableText
                     text="Submit"
                     onPress={handleSubmit((data) => {
                         onSubmit(data as ExerciseForm);
@@ -75,9 +109,14 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     input: {
-        height: 40,
-        margin: 12,
+        flex: 1,
+        height: 30,
+        margin: 2,
         borderWidth: 1,
-        padding: 10,
+        padding: 5,
+        borderRadius: 5,
     },
+    rowContainer: {
+        flexDirection: 'row',
+    }
 })

@@ -5,7 +5,7 @@ export default function PlannerScreen({navigation}: any){
 
 
     const handelFormSbmit = (form: ExerciseForm) => {
-        alert(`${form.name} - ${form.duration}`)
+        alert(`${form.name} - ${form.duration} - ${form.reps} - ${form.type}`)
     }
 
 
