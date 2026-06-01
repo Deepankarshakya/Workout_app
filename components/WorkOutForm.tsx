@@ -16,11 +16,14 @@ type WorkoutProps = {
 }
 
 
+const selectionItems = ["exercise", "break", "streach"]
+
 export default function WorkOutForm({
     onSubmit
 }: WorkoutProps) {
 
     const { control, handleSubmit } = useForm();
+    const [isSelectionOn, setSelectionOn] = useState(false);
 
     return (
         <View style={styles.container}>
@@ -82,12 +85,27 @@ export default function WorkOutForm({
                         }}
                         name="type"
                         render={({ field: { onChange, value } }) =>
-                            <TextInput
-                                onChangeText={onChange}
-                                value={value}
-                                style={styles.input}
-                                placeholder="Types"
-                            />
+                            <View style={{flex:1}}>
+                                {isSelectionOn ?
+                                    <View>
+                                        {
+                                            selectionItems.map(selection =>
+                                                <PressableText 
+                                                    key={selection}
+                                                    text={selection}
+                                                    style={styles.selection}
+                                                    onPress={() => setSelectionOn(false)}/>
+                                            )}
+                                    </View> :
+                                    <TextInput
+                                        onFocus={() => setSelectionOn(true)}
+                                        style={styles.input}
+                                        placeholder="Types"
+                                    />
+                                }
+
+                            </View>
+
                         }
                     />
                 </View>
@@ -118,5 +136,10 @@ const styles = StyleSheet.create({
     },
     rowContainer: {
         flexDirection: 'row',
+    },
+    selection:{
+        margin: 2,
+        padding: 3,
+        alignSelf: "center",
     }
 })
