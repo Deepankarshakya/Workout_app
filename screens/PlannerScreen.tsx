@@ -1,9 +1,10 @@
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
 import { SequenceItems, SequenceType } from '../types/data';
 import slugify from "@sindresorhus/slugify"
 import { useState } from 'react';
 import { FlatList } from 'react-native-gesture-handler';
+import ExerciseItem from '../components/ExerciseItem';
 
 export default function PlannerScreen({navigation}: any){
     const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
@@ -33,9 +34,7 @@ export default function PlannerScreen({navigation}: any){
             <FlatList
             data={seqItems}
             keyExtractor={item => item.slug}
-            renderItem={({item}) => 
-                <Text>{item.name}</Text>
-            }
+            renderItem={ExerciseItem}
             />
         </View>
     )
