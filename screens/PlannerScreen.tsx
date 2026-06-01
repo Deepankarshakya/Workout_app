@@ -1,9 +1,12 @@
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
 import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
 import { SequenceItems, SequenceType } from '../types/data';
 import slugify from "@sindresorhus/slugify"
+import { useState } from 'react';
+import { FlatList } from 'react-native-gesture-handler';
 
 export default function PlannerScreen({navigation}: any){
+    const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
 
 
     const handelFormSbmit = (form: ExerciseFormData) => {
@@ -18,14 +21,22 @@ export default function PlannerScreen({navigation}: any){
             sequenceItem.reps=Number(form.reps)
         }
 
-        console.log(sequenceItem);
+        setSeqItems([...seqItems, sequenceItem]);
     }
 
 
     return(
         <View style={styles.container}>
+
             <ExerciseForm 
             onSubmit={handelFormSbmit}/>
+            <FlatList
+            data={seqItems}
+            keyExtractor={item => item.slug}
+            renderItem={({item}) => 
+                <Text>{item.name}</Text>
+            }
+            />
         </View>
     )
 }
