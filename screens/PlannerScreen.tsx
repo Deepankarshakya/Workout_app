@@ -1,13 +1,14 @@
 import {View, StyleSheet} from 'react-native';
 import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
 import { SequenceItems, SequenceType } from '../types/data';
+import slugify from "@sindresorhus/slugify"
 
 export default function PlannerScreen({navigation}: any){
 
 
     const handelFormSbmit = (form: ExerciseFormData) => {
         const sequenceItem: SequenceItems ={
-            slug: form.name + Date.now(),
+            slug: slugify(form.name + " " + Date.now(), {lowercase:true}),
             name: form.name,
             type: form.type as SequenceType,
             duration : Number(form.duration)
