@@ -5,6 +5,7 @@ import slugify from "@sindresorhus/slugify"
 import { useState } from 'react';
 import { FlatList } from 'react-native-gesture-handler';
 import ExerciseItem from '../components/ExerciseItem';
+import { PressableTextClose } from '../components/styled/pressableclose';
 
 export default function PlannerScreen({navigation}: any){
     const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
@@ -28,14 +29,26 @@ export default function PlannerScreen({navigation}: any){
 
     return(
         <View style={styles.container}>
-
-            <ExerciseForm 
-            onSubmit={handelFormSbmit}/>
             <FlatList
             data={seqItems}
+            renderItem={({item, index}) =>
+                <ExerciseItem item={item}>
+                    <PressableTextClose 
+                        text="Remove"
+                        onPressIn={() => {
+                            const items = [...seqItems]
+                            items.splice(index, 1);
+                            setSeqItems(items)
+
+                        }}
+                    />
+                </ExerciseItem>
+            }
             keyExtractor={item => item.slug}
-            renderItem={ExerciseItem}
             />
+            <ExerciseForm 
+            onSubmit={handelFormSbmit}/>
+
         </View>
     )
 }
