@@ -94,13 +94,16 @@ export default function WorkOutForm({
                                                     key={selection}
                                                     text={selection}
                                                     style={styles.selection}
-                                                    onPress={() => setSelectionOn(false)}/>
+                                                    onPress={() => {
+                                                        onChange(selection)
+                                                        setSelectionOn(false)}}/>
                                             )}
                                     </View> :
                                     <TextInput
                                         onFocus={() => setSelectionOn(true)}
                                         style={styles.input}
                                         placeholder="Types"
+                                        value={value}
                                     />
                                 }
 
