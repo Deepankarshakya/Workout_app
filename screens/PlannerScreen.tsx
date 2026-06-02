@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text } from 'react-native';
 import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
-import { SequenceItems, SequenceType } from '../types/data';
+import { SequenceItems, SequenceType, Workout } from '../types/data';
 import slugify from "@sindresorhus/slugify"
 import { useState } from 'react';
 import { FlatList } from 'react-native-gesture-handler';
@@ -30,13 +30,24 @@ export default function PlannerScreen({ navigation }: any) {
     }
 
     const handelWorkoutSubmit = (from: WorkoutFormData) => {
-        console.log(from);
-        const workout = {
+        if(seqItems.length > 0){
+
+            const duration = seqItems.reduce((acc, item) => {
+                return acc + item.duration;
+            }, 0)
+
+
+        const workout: Workout = {
             name : from.name,
             slug: slugify(from.name + " " + Date.now(), { lowercase: true }),
+            difficulty:"easy",
+            sequence: [...seqItems],
+            duration,
         }
 
         console.log(workout);
+        }
+
     }
 
 
