@@ -96,11 +96,18 @@ export default function PlannerScreen({ navigation }: any) {
                             onPress={handelOpen}
                         />
                     }>
+                        { ({handelClose}) => 
                     <View>
                         <WorkoutForm
-                            onSubmit={handelWorkoutSubmit}
+                            onSubmit={(data) => {
+                                handelWorkoutSubmit(data)
+                                handelClose()
+                            }}
                         />
                     </View>
+
+                        }
+
                 </Modal>
             </View>
         </View>

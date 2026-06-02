@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Modal as DefaultModel } from 'react-native';
 import { PressableText } from "./Pressable"
-import { FunctionComponent, ReactNode, useState } from "react"
+import React, { FunctionComponent, ReactNode, useState } from "react"
 import { PressableTextClose } from './pressableclose';
 
 type ModalProps = {
@@ -9,7 +9,11 @@ type ModalProps = {
         handelOpen: () => void
     }
     >,
-    children: React.ReactNode
+    children: (props:
+    {
+        handelOpen: () => void,
+        handelClose: () => void
+    }) => React.ReactNode;
 }
 
 export function Modal({
@@ -17,6 +21,8 @@ export function Modal({
     children
 }: ModalProps) {
     const [isModelVisible, setModelVisible] = useState(false);
+    const handelOpen = () => setModelVisible(true)
+    const handelClose = () => setModelVisible(false)
 
     return (
         <View>
@@ -27,10 +33,10 @@ export function Modal({
             >
                 <View style={styles.centerView}>
                     <View style={styles.contentView}>
-                        {children}
+                        {children({handelOpen, handelClose})}
                     </View>
                     <PressableTextClose
-                        onPress={() => setModelVisible(false)}
+                        onPress={handelClose}
                         text="Close Model"
                     />
                 </View>
@@ -38,10 +44,10 @@ export function Modal({
             {
                 Activator ?
                     <Activator
-                        handelOpen = {() => setModelVisible(true)}
+                        handelOpen = {handelOpen}
                     /> :
                     <PressableText
-                        onPress={() => setModelVisible(true)}
+                        onPress={handelOpen}
                         text=""
                     />
             }

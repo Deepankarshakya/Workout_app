@@ -76,8 +76,10 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
                         />
                     }
                 >
-                    <Text style={{ fontSize: 16, fontWeight: 'bold', padding: 20 }}>The Sequences to follow are given below</Text>
+                    {() =>
+                    
                     <View>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold', padding: 20 }}>The Sequences to follow are given below</Text>
                         {workout.sequence.map((si, idx) =>
                             <View key={si.slug} style={styles.sequenceItems}>
                                 <Text style={{ justifyContent: "center", padding: 2, alignItems: 'center', margin: 'auto' }}>
@@ -92,6 +94,8 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
                             </View>
                         )}
                     </View>
+                    }
+                    
                 </Modal>
             </WorkoutItem>
             <View style={styles.centerView}>
