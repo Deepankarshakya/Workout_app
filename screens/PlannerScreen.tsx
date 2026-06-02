@@ -29,6 +29,19 @@ export default function PlannerScreen({ navigation }: any) {
         setSeqItems([...seqItems, sequenceItem]);
     }
 
+    const computeDiff = (exercisesCount: number, workoutDuration: number) => {
+
+        const intensity = workoutDuration / exercisesCount;
+        if(intensity <= 60){
+            return "hard";
+        }else if(intensity <= 100){
+            return "normal";
+        }
+        else {
+            return "easy";
+        }
+    }
+
     const handelWorkoutSubmit = (from: WorkoutFormData) => {
         if(seqItems.length > 0){
 
@@ -40,7 +53,7 @@ export default function PlannerScreen({ navigation }: any) {
         const workout: Workout = {
             name : from.name,
             slug: slugify(from.name + " " + Date.now(), { lowercase: true }),
-            difficulty:"easy",
+            difficulty: computeDiff(seqItems.length, duration),
             sequence: [...seqItems],
             duration,
         }
