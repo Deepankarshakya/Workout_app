@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text} from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
 import { SequenceItems, SequenceType } from '../types/data';
 import slugify from "@sindresorhus/slugify"
@@ -8,63 +8,73 @@ import ExerciseItem from '../components/ExerciseItem';
 import { PressableTextClose } from '../components/styled/pressableclose';
 import { Modal } from '../components/styled/Modal';
 import { PressableText } from '../components/styled/Pressable';
-import WorkoutForm from '../components/WorkoutForm';
+import WorkoutForm, { WorkoutFormData } from '../components/WorkoutForm';
 
-export default function PlannerScreen({navigation}: any){
+export default function PlannerScreen({ navigation }: any) {
     const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
 
 
-    const handelFormSbmit = (form: ExerciseFormData) => {
-        const sequenceItem: SequenceItems ={
-            slug: slugify(form.name + " " + Date.now(), {lowercase:true}),
+    const handelExerciseSubmit = (form: ExerciseFormData) => {
+        const sequenceItem: SequenceItems = {
+            slug: slugify(form.name + " " + Date.now(), { lowercase: true }),
             name: form.name,
             type: form.type as SequenceType,
-            duration : Number(form.duration)
+            duration: Number(form.duration)
         };
 
-        if(form.reps){
-            sequenceItem.reps=Number(form.reps)
+        if (form.reps) {
+            sequenceItem.reps = Number(form.reps)
         }
 
         setSeqItems([...seqItems, sequenceItem]);
     }
 
+    const handelWorkoutSubmit = (from: WorkoutFormData) => {
+        console.log(from);
+        const workout = {
+            name : from.name,
+            slug: slugify(from.name + " " + Date.now(), { lowercase: true }),
+        }
 
-    return(
+        console.log(workout);
+    }
+
+
+    return (
         <View style={styles.container}>
 
-            <ExerciseForm 
-            onSubmit={handelFormSbmit}/>
-            <FlatList
-            data={seqItems}
-            renderItem={({item, index}) =>
-                <ExerciseItem item={item}>
-                    <PressableTextClose 
-                        text="Remove"
-                        onPressIn={() => {
-                            const items = [...seqItems]
-                            items.splice(index, 1);
-                            setSeqItems(items)
+            <ExerciseForm
+                onSubmit={handelExerciseSubmit} 
+            />
 
-                        }}
-                    />
-                </ExerciseItem>
-            }
-            keyExtractor={item => item.slug}
+            <FlatList
+                data={seqItems}
+                renderItem={({ item, index }) =>
+                    <ExerciseItem item={item}>
+                        <PressableTextClose
+                            text="Remove"
+                            onPressIn={() => {
+                                const items = [...seqItems]
+                                items.splice(index, 1);
+                                setSeqItems(items)
+
+                            }}
+                        />
+                    </ExerciseItem>
+                }
+                keyExtractor={item => item.slug}
             />
             <View>
                 <Modal
-                activator={({handelOpen}) => 
-                    <PressableText
-                    text="Create workout"
-                    onPress={handelOpen}
-                    />
-                }>
+                    activator={({ handelOpen }) =>
+                        <PressableText
+                            text="Create workout"
+                            onPress={handelOpen}
+                        />
+                    }>
                     <View>
                         <WorkoutForm
-                        onSubmit={(data) => {
-                            console.log(data);
-                        }}
+                            onSubmit={handelWorkoutSubmit}
                         />
                     </View>
                 </Modal>
@@ -75,7 +85,7 @@ export default function PlannerScreen({navigation}: any){
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1, 
-        padding:10,
+        flex: 1,
+        padding: 10,
     }
 })

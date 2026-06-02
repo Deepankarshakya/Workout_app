@@ -31,6 +31,7 @@ export default function WorkoutForm({
                         onChangeText={onChange}
                         value={value}
                         style={styles.input}
+                        placeholderTextColor={"rgb(0,0,0,0.4)"}
                         placeholder="Workout Name"
                     />
                 }
