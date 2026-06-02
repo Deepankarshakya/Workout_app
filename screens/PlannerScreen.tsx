@@ -1,4 +1,4 @@
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
 import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
 import { SequenceItems, SequenceType } from '../types/data';
 import slugify from "@sindresorhus/slugify"
@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { FlatList } from 'react-native-gesture-handler';
 import ExerciseItem from '../components/ExerciseItem';
 import { PressableTextClose } from '../components/styled/pressableclose';
+import { Modal } from '../components/styled/Modal';
+import { PressableText } from '../components/styled/Pressable';
 
 export default function PlannerScreen({navigation}: any){
     const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
@@ -49,6 +51,19 @@ export default function PlannerScreen({navigation}: any){
             }
             keyExtractor={item => item.slug}
             />
+            <View>
+                <Modal
+                activator={({handelOpen}) => 
+                    <PressableText
+                    text="Create workout"
+                    onPress={handelOpen}
+                    />
+                }>
+                    <View>
+                        <Text>Hear Will be my modal</Text>
+                    </View>
+                </Modal>
+            </View>
         </View>
     )
 }
