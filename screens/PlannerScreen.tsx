@@ -8,6 +8,7 @@ import ExerciseItem from '../components/ExerciseItem';
 import { PressableTextClose } from '../components/styled/pressableclose';
 import { Modal } from '../components/styled/Modal';
 import { PressableText } from '../components/styled/Pressable';
+import WorkoutForm from '../components/WorkoutForm';
 
 export default function PlannerScreen({navigation}: any){
     const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
@@ -60,7 +61,11 @@ export default function PlannerScreen({navigation}: any){
                     />
                 }>
                     <View>
-                        <Text>Hear Will be my modal</Text>
+                        <WorkoutForm
+                        onSubmit={(data) => {
+                            console.log(data);
+                        }}
+                        />
                     </View>
                 </Modal>
             </View>
