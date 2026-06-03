@@ -1,61 +1,131 @@
-import {View, StyleSheet} from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
-import { SequenceItems, SequenceType } from '../types/data';
+import { SequenceItems, SequenceType, Workout } from '../types/data';
 import slugify from "@sindresorhus/slugify"
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList } from 'react-native-gesture-handler';
+import { useFocusEffect } from '@react-navigation/native';
 import ExerciseItem from '../components/ExerciseItem';
 import { PressableTextClose } from '../components/styled/pressableclose';
+import { Modal } from '../components/styled/Modal';
+import { PressableText } from '../components/styled/Pressable';
+import WorkoutForm, { WorkoutFormData } from '../components/WorkoutForm';
+import { storeWorkout } from '../storage/workout';
 
-export default function PlannerScreen({navigation}: any){
+export default function PlannerScreen({ navigation }: any) {
     const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
 
+    useFocusEffect(
+        useCallback(() => {
+            return () => setSeqItems([]);
+        }, [])
+    );
 
-    const handelFormSbmit = (form: ExerciseFormData) => {
-        const sequenceItem: SequenceItems ={
-            slug: slugify(form.name + " " + Date.now(), {lowercase:true}),
+
+    const handelExerciseSubmit = (form: ExerciseFormData) => {
+        const sequenceItem: SequenceItems = {
+            slug: slugify(form.name + " " + Date.now(), { lowercase: true }),
             name: form.name,
             type: form.type as SequenceType,
-            duration : Number(form.duration)
+            duration: Number(form.duration)
         };
 
-        if(form.reps){
-            sequenceItem.reps=Number(form.reps)
+        if (form.reps) {
+            sequenceItem.reps = Number(form.reps)
         }
 
         setSeqItems([...seqItems, sequenceItem]);
     }
 
+    const computeDiff = (exercisesCount: number, workoutDuration: number) => {
 
-    return(
+        const intensity = workoutDuration / exercisesCount;
+        if(intensity <= 60){
+            return "hard";
+        }else if(intensity <= 100){
+            return "normal";
+        }
+        else {
+            return "easy";
+        }
+    }
+
+    const handelWorkoutSubmit = async (from: WorkoutFormData) => {
+        if(seqItems.length > 0){
+
+            const duration = seqItems.reduce((acc, item) => {
+                return acc + item.duration;
+            }, 0)
+
+
+        const workout: Workout = {
+            name : from.name,
+            slug: slugify(from.name + " " + Date.now(), { lowercase: true }),
+            difficulty: computeDiff(seqItems.length, duration),
+            sequence: [...seqItems],
+            duration,
+        }
+
+        await storeWorkout(workout);
+        }
+
+    }
+
+
+    return (
         <View style={styles.container}>
 
-            <ExerciseForm 
-            onSubmit={handelFormSbmit}/>
-            <FlatList
-            data={seqItems}
-            renderItem={({item, index}) =>
-                <ExerciseItem item={item}>
-                    <PressableTextClose 
-                        text="Remove"
-                        onPressIn={() => {
-                            const items = [...seqItems]
-                            items.splice(index, 1);
-                            setSeqItems(items)
-
-                        }}
-                    />
-                </ExerciseItem>
-            }
-            keyExtractor={item => item.slug}
+            <ExerciseForm
+                onSubmit={handelExerciseSubmit} 
             />
+
+            <FlatList
+                data={seqItems}
+                renderItem={({ item, index }) =>
+                    <ExerciseItem item={item}>
+                        <PressableTextClose
+                            text="Remove"
+                            onPressIn={() => {
+                                const items = [...seqItems]
+                                items.splice(index, 1);
+                                setSeqItems(items)
+
+                            }}
+                        />
+                    </ExerciseItem>
+                }
+                keyExtractor={item => item.slug}
+            />
+            <View>
+                <Modal
+                    activator={({ handelOpen }) =>
+                        <PressableText
+                            text="Create workout"
+                            onPress={handelOpen}
+                        />
+                    }>
+                        { ({handelClose}) => 
+                    <View>
+                        <WorkoutForm
+                            onSubmit={async(data) => {
+                                await handelWorkoutSubmit(data);
+                                handelClose();
+                                navigation.navigate("Home");
+                            }}
+                        />
+                    </View>
+
+                        }
+
+                </Modal>
+            </View>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1, 
-        padding:10,
+        flex: 1,
+        padding: 10,
     }
 })
