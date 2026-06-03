@@ -2,16 +2,24 @@ import { View, StyleSheet, Text } from 'react-native';
 import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
 import { SequenceItems, SequenceType, Workout } from '../types/data';
 import slugify from "@sindresorhus/slugify"
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList } from 'react-native-gesture-handler';
+import { useFocusEffect } from '@react-navigation/native';
 import ExerciseItem from '../components/ExerciseItem';
 import { PressableTextClose } from '../components/styled/pressableclose';
 import { Modal } from '../components/styled/Modal';
 import { PressableText } from '../components/styled/Pressable';
 import WorkoutForm, { WorkoutFormData } from '../components/WorkoutForm';
+import { storeWorkout } from '../storage/workout';
 
 export default function PlannerScreen({ navigation }: any) {
     const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => setSeqItems([]);
+        }, [])
+    );
 
 
     const handelExerciseSubmit = (form: ExerciseFormData) => {
@@ -42,7 +50,7 @@ export default function PlannerScreen({ navigation }: any) {
         }
     }
 
-    const handelWorkoutSubmit = (from: WorkoutFormData) => {
+    const handelWorkoutSubmit = async (from: WorkoutFormData) => {
         if(seqItems.length > 0){
 
             const duration = seqItems.reduce((acc, item) => {
@@ -58,7 +66,7 @@ export default function PlannerScreen({ navigation }: any) {
             duration,
         }
 
-        console.log(workout);
+        await storeWorkout(workout);
         }
 
     }
@@ -99,9 +107,10 @@ export default function PlannerScreen({ navigation }: any) {
                         { ({handelClose}) => 
                     <View>
                         <WorkoutForm
-                            onSubmit={(data) => {
-                                handelWorkoutSubmit(data)
-                                handelClose()
+                            onSubmit={async(data) => {
+                                await handelWorkoutSubmit(data);
+                                handelClose();
+                                navigation.navigate("Home");
                             }}
                         />
                     </View>
