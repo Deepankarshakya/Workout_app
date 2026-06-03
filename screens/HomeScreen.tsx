@@ -1,12 +1,46 @@
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
-import { ImportMetaRegistry } from 'expo/build/winter/ImportMetaRegistry';
+import { View, Text, StyleSheet, FlatList, Pressable, Alert, TouchableOpacity, Platform } from 'react-native';
+import { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import WorkoutItem from '../components/Workoutitem';
-import { useWorkouts } from '../hooks/useWorkouts';
-
-
+import { getWorkouts, deleteWorkout } from '../storage/workout';
+import { Workout } from '../types/data';
 
 export default function HomeScreen({ navigation }: any) {
-    const workouts = useWorkouts();
+    const [workouts, setWorkouts] = useState<Workout[]>([]);
+
+    useFocusEffect(
+        useCallback(() => {
+            async function load() {
+                const data = await getWorkouts();
+                setWorkouts(data);
+            }
+            load();
+        }, [])
+    );
+
+    const handleDelete = (slug: string) => {
+        const del = async () => {
+            await deleteWorkout(slug);
+            setWorkouts(prev => prev.filter(w => w.slug !== slug));
+        };
+
+        if (Platform.OS === 'web') {
+            if (window.confirm("Are you sure you want to delete this workout?")) {
+                del();
+            }
+        } else {
+            Alert.alert(
+                "Delete Workout",
+                "Are you sure you want to delete this workout?",
+                [
+                    { text: "Cancel", style: "cancel" },
+                    { text: "Delete", style: "destructive", onPress: del }
+                ]
+            );
+        }
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.header}>Work Out List</Text>
@@ -19,7 +53,15 @@ export default function HomeScreen({ navigation }: any) {
                         >
                             <WorkoutItem
                                 item={item}
-                            />
+                                childstyle={{ position: "absolute", right: 12, top: 0, bottom: 0, justifyContent: "center" }}
+                            >
+                                <TouchableOpacity
+                                    onPress={() => handleDelete(item.slug)}
+                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                >
+                                    <Ionicons name="trash-outline" size={20} color="#ef4444" />
+                                </TouchableOpacity>
+                            </WorkoutItem>
                         </Pressable>
                     )
                 }}
@@ -41,6 +83,5 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 10,
         fontWeight: 'bold',
-    }
-
+    },
 })
