@@ -13,6 +13,7 @@ import { defaultHeaderOptions } from "./styles";
 
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import useAuth from "../hooks/useAuth";
 
@@ -30,11 +31,13 @@ function AuthNavigator() {
     return (
         <Stack.Navigator>
             <Stack.Screen
+                options={{...defaultHeaderOptions}}
                 name="SignIn"
                 component={SignInScreen}
             />
 
             <Stack.Screen
+            options={{...defaultHeaderOptions}}
                 name="SignUp"
                 component={SignUpScreen}
             />
