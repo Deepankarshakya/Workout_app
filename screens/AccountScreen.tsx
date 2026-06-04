@@ -1,17 +1,26 @@
-import { useEffect } from 'react';
-import {View, Text, Button} from 'react-native';
+import { View, Text, Button } from "react-native";
+import { supabase } from "../lib/supabase";
+import useAuth from "../hooks/useAuth";
 
-export default function AccountScreen({navigation}: any){
+export default function AccountScreen() {
+    const { user } = useAuth();
 
-        useEffect(() => {
-        console.log("Rendering Account Screen");
+    const signOut = async () => {
+        await supabase.auth.signOut();
+    };
 
-        return()=> console.log("Unmounting Account Screen");
-    }, [])
+    return (
+        <View style={{ padding: 20 }}>
+            <Text>Email:</Text>
+            <Text>{user?.email}</Text>
 
-    return(
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>I am Setting Screen</Text>
+            <Text>User ID:</Text>
+            <Text>{user?.id}</Text>
+
+            <Button
+                title="Sign Out"
+                onPress={signOut}
+            />
         </View>
-    )
+    );
 }

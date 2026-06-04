@@ -11,6 +11,11 @@ import AccountScreen from "../screens/AccountScreen";
 import WorkoutDetailScreen from "../screens/WorkOutDetailScreen";
 import { defaultHeaderOptions } from "./styles";
 
+import SignInScreen from "../screens/SignInScreen";
+import SignUpScreen from "../screens/SignUpScreen";
+
+import useAuth from "../hooks/useAuth";
+
 export default function Navigation() {
     return (
         <NavigationContainer>
@@ -21,9 +26,31 @@ export default function Navigation() {
 }
 
 const Stack = createNativeStackNavigator();
-function RootNavigator() {
+function AuthNavigator() {
     return (
         <Stack.Navigator>
+            <Stack.Screen
+                name="SignIn"
+                component={SignInScreen}
+            />
+
+            <Stack.Screen
+                name="SignUp"
+                component={SignUpScreen}
+            />
+        </Stack.Navigator>
+    );
+}
+function RootNavigator() {
+    const { user, loading } = useAuth();
+
+    if(loading){
+        return null;
+    }
+
+    return (
+        <Stack.Navigator>
+            {user ? (<>
             <Stack.Screen
                 name="Root"
                 component={BottomTabNavigator}
@@ -37,6 +64,15 @@ function RootNavigator() {
                     ...defaultHeaderOptions,
                     title: "" }}
             />
+            </>
+            ): (
+                <Stack.Screen
+                    name="Auth"
+                    component={AuthNavigator}
+                    options={{headerShown: false}}
+                />
+            )}
+            
         </Stack.Navigator>
     )
 
