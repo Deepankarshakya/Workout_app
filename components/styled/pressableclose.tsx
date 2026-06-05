@@ -20,13 +20,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: '#d0d0d0',
         borderWidth: 1,
-        shadowColor: '#65ccf5',
+        shadowColor: '#f56a65',
         shadowOffset: { width: 0, height: 5 },
         shadowOpacity: 0.4,
         shadowRadius: 5,
         elevation: 10,
         alignItems:'center',
         justifyContent:'center',
+        marginTop:10,
 
     },
     text: {

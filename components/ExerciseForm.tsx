@@ -124,7 +124,16 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
         borderRadius: 10,
-        padding: 10,
+        padding: 10,    
+        borderColor: '#d0d0d0',
+        borderWidth: 1,
+        shadowColor: '#65ccf5',
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.4,
+        shadowRadius: 5,
+        elevation: 10,
+        margin: 1,
+        paddingBottom:20,
     },
     input: {
         flex: 1,
