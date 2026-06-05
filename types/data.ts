@@ -1,4 +1,11 @@
-
+export interface WorkoutLog {
+    id: string,
+    workoutSlug: string,
+    workoutName: string,
+    completedAt: string,
+    totalDuration: number,
+    exercisesCompleted: number,
+}
 
 
 
