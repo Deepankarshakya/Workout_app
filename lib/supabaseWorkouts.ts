@@ -20,6 +20,21 @@ export const fetchWorkouts = async (userId: string): Promise<Workout[]> => {
   }));
 };
 
+export const saveWorkoutLogToSupabase = async (
+  userId: string,
+  log: WorkoutLog
+) => {
+  const { error } = await supabase.from("workout_logs").insert({
+    user_id: userId,
+    workout_slug: log.workoutSlug,
+    workout_name: log.workoutName,
+    completed_at: log.completedAt,
+    total_duration: log.totalDuration,
+    exercises_completed: log.exercisesCompleted,
+  });
+
+  if (error) throw error;
+};
 export const saveWorkoutToSupabase = async (userId: string, workout: Workout): Promise<void> => {
   const { error } = await supabase.from("workouts").upsert({
     user_id: userId,
@@ -62,17 +77,4 @@ export const fetchWorkoutLogs = async (userId: string): Promise<WorkoutLog[]> =>
     totalDuration: l.total_duration,
     exercisesCompleted: l.exercises_completed,
   }));
-};
-
-export const saveWorkoutLogToSupabase = async (userId: string, log: WorkoutLog): Promise<void> => {
-  const { error } = await supabase.from("workout_logs").insert({
-    user_id: userId,
-    workout_slug: log.workoutSlug,
-    workout_name: log.workoutName,
-    completed_at: log.completedAt,
-    total_duration: log.totalDuration,
-    exercises_completed: log.exercisesCompleted,
-  });
-
-  if (error) throw error;
 };

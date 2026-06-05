@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text,Button, StyleSheet } from 'react-native';
 import { useWorkoutBySlug } from '../hooks/useWorkoutsBySlug';
 import { Modal } from '../components/styled/Modal';
 import { PressableText } from '../components/styled/Pressable';
@@ -9,6 +9,8 @@ import WorkoutItem from '../components/Workoutitem';
 import { useEffect, useState } from 'react';
 import { SequenceItems } from '../types/data';
 import { useCountDown } from '../hooks/useCountDown';
+import { supabase } from "../lib/supabase";
+import { saveWorkoutLogToSupabase } from "../lib/supabaseWorkouts";
 
 type DetailParams = {
     route: {
@@ -20,7 +22,7 @@ type DetailParams = {
 
 type Navigation = any & DetailParams
 
-export default function WorkoutDetailScreen({ route }: Navigation) {
+export default function WorkoutDetailScreen({ route, navigation }: any) {
     const [sequence, setSequence] = useState<SequenceItems[]>([])
 
     const [trackerIdx, setTrackerIdx] = useState(-1);
@@ -39,6 +41,38 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
             addItemToSequence(trackerIdx + 1)
         }
     }, [countDown])
+
+const completeWorkout = async () => {
+  if (!workout) return;
+
+  try {
+    const log = {
+      id: Date.now().toString(),
+      workoutSlug: workout.slug,
+      workoutName: workout.name,
+      completedAt: new Date().toISOString(),
+      totalDuration: workout.duration,
+      exercisesCompleted: workout.sequence.length,
+    };
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      await saveWorkoutLogToSupabase(user.id, log);
+    }
+
+    alert("Workout completed 🎉");
+
+    navigation.navigate("History");
+
+    setSequence([]);
+    setTrackerIdx(-1);
+  } catch (error) {
+    console.log("Failed to save workout log", error);
+  }
+};
 
 
     const addItemToSequence = (idx: number) => {
@@ -157,6 +191,11 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
                     }
                 </Text>
             </View>
+
+            <Button
+  title="Finish Workout"
+  onPress={completeWorkout}
+/>
         </View>
     )
 }
