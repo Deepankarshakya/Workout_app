@@ -15,6 +15,11 @@ export const getWorkoutBySlug = async(slug: string): Promise<Workout>  => {
     return workout;
 }
 
+export const saveWorkouts = async (
+  workouts: Workout[]
+): Promise<void> => {
+  await storeData("workout-data", workouts);
+};
 
 export const initWorkouts = async ():Promise<boolean> => {
     const hasWorkouts = await containsKey("workout-data");

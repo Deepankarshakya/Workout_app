@@ -1,49 +1,93 @@
-import { View, Text, StyleSheet, FlatList, Pressable, Alert, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, Button, StyleSheet, FlatList, Pressable, Alert, TouchableOpacity, Platform } from 'react-native';
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import WorkoutItem from '../components/Workoutitem';
 import { getWorkouts, deleteWorkout } from '../storage/workout';
 import { Workout } from '../types/data';
+import {
+    saveWorkoutToSupabase,
+    fetchWorkouts,
+} from "../lib/supabaseWorkouts";
+import { supabase } from "../lib/supabase";
+import { deleteWorkoutFromSupabase } from "../lib/supabaseWorkouts";
+import { useWorkouts } from "../hooks/useWorkouts";
 
 export default function HomeScreen({ navigation }: any) {
-    const [workouts, setWorkouts] = useState<Workout[]>([]);
+    const workouts = useWorkouts();
 
-    useFocusEffect(
-        useCallback(() => {
-            async function load() {
-                const data = await getWorkouts();
-                setWorkouts(data);
+
+
+    const testSupabase = async () => {
+        try {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
+
+            if (!user) {
+                console.log("No user logged in");
+                return;
             }
-            load();
-        }, [])
-    );
 
-    const handleDelete = (slug: string) => {
-        const del = async () => {
-            await deleteWorkout(slug);
-            setWorkouts(prev => prev.filter(w => w.slug !== slug));
-        };
+            await saveWorkoutToSupabase(user.id, {
+                slug: "test-workout",
+                name: "Test Workout",
+                duration: 15,
+                difficulty: "easy",
+                sequence: [],
+            });
 
-        if (Platform.OS === 'web') {
-            if (window.confirm("Are you sure you want to delete this workout?")) {
-                del();
-            }
-        } else {
-            Alert.alert(
-                "Delete Workout",
-                "Are you sure you want to delete this workout?",
-                [
-                    { text: "Cancel", style: "cancel" },
-                    { text: "Delete", style: "destructive", onPress: del }
-                ]
-            );
+            const workouts = await fetchWorkouts(user.id);
+
+            console.log("Fetched workouts:", workouts);
+        } catch (err) {
+            console.error(err);
         }
+    };
+
+const handleDelete = (slug: string) => {
+    const del = async () => {
+        await deleteWorkout(slug);
+
+        try {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
+
+            if (user) {
+                await deleteWorkoutFromSupabase(
+                    user.id,
+                    slug
+                );
+            }
+        } catch (error) {
+            console.log("Supabase delete failed", error);
+        }
+    };
+
+    if (Platform.OS === 'web') {
+        if (window.confirm("Are you sure you want to delete this workout?")) {
+            del();
+        }
+    } else {
+        Alert.alert(
+            "Delete Workout",
+            "Are you sure you want to delete this workout?",
+            [
+                { text: "Cancel", style: "cancel" },
+                { text: "Delete", style: "destructive", onPress: del }
+            ]
+        );
     }
+};
 
     return (
         <View style={styles.container}>
             <Text style={styles.header}>Work Out List</Text>
+            <Button
+                title="Test Supabase"
+                onPress={testSupabase}
+            />
             <FlatList
                 data={workouts}
                 renderItem={({ item }) => {

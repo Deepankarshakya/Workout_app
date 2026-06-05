@@ -11,6 +11,8 @@ import { Modal } from '../components/styled/Modal';
 import { PressableText } from '../components/styled/Pressable';
 import WorkoutForm, { WorkoutFormData } from '../components/WorkoutForm';
 import { storeWorkout } from '../storage/workout';
+import { supabase } from "../lib/supabase";
+import { saveWorkoutToSupabase } from "../lib/supabaseWorkouts";
 
 export default function PlannerScreen({ navigation }: any) {
     const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
@@ -67,6 +69,23 @@ export default function PlannerScreen({ navigation }: any) {
         }
 
         await storeWorkout(workout);
+
+try {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    await saveWorkoutToSupabase(
+      user.id,
+      workout
+    );
+
+    console.log("Workout synced");
+  }
+} catch (error) {
+  console.log("Workout sync failed", error);
+}
         }
 
     }
