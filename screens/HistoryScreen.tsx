@@ -46,12 +46,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#ffffff",
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
     marginBottom: 12,
+    margin:'auto',
   },
   card: {
     backgroundColor: "#fff",

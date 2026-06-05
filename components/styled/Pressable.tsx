@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 10,
         margin: 3,
+        marginTop:10,
 
     },
     text: {
