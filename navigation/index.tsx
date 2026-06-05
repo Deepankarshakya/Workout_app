@@ -14,6 +14,7 @@ import { defaultHeaderOptions } from "./styles";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
+import HistoryScreen from "../screens/HistoryScreen";
 
 import useAuth from "../hooks/useAuth";
 
@@ -103,6 +104,14 @@ function BottomTabNavigator() {
                         <Entypo name="add-to-list" size={size} color={color} />
                 }}
             />
+            <BottomTab.Screen
+    name="History"
+    component={HistoryScreen}
+    options={{
+        tabBarIcon: ({ size, color }) =>
+            <Ionicons name="time-outline" size={size} color={color} />
+    }}
+/>
             <BottomTab.Screen
                 name="Settings"
                 component={AccountScreen}
