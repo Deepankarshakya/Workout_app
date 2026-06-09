@@ -16,7 +16,7 @@ type WorkoutProps = {
 }
 
 
-const selectionItems = ["exercise", "break", "streach"]
+const selectionItems = ["exercise", "break", "stretch"]
 
 export default function ExerciseForm({
     onSubmit
@@ -36,42 +36,60 @@ export default function ExerciseForm({
                         }}
                         name="name"
                         render={({ field: { onChange, value } }) =>
+                            <View style={{ flex: 1 }}>
+                                <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Enter Name'}</Text>
                             <TextInput
                                 onChangeText={onChange}
                                 value={value}
                                 style={styles.input}
                                 placeholder="Name"
                             />
+                            <Text style={{ height: 14 }} />
+                            </View>
                         }
                     />
 
                     <Controller
                         control={control}
                         rules={{
-                            required: true
+                            required: true,
+                            validate: (value) => !isNaN(Number(value)) || "Must be a number"
                         }}
                         name="duration"
-                        render={({ field: { onChange, value } }) =>
+                        render={({ field: { onChange, value }, fieldState: { error } }) =>
+                            <View style={{flex:1}}>
+                                <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Duration (seconds)'}</Text>
                             <TextInput
-                                onChangeText={onChange}
-                                value={value}
-                                style={styles.input}
+                                onChangeText={(text) => onChange(text)}
+                                value={value?.toString()}
+                                style={[styles.input, error && { borderColor: 'red' }]}
                                 placeholder="Duration"
                             />
+                            {error && <Text style={{ color: 'red', fontSize: 10, height:14}}>{error.message}</Text>}
+                            </View>
+
                         }
                     />
                 </View>
                 <View style={styles.rowContainer}>
                     <Controller
                         control={control}
+                        rules={{
+                            required: true,
+                            validate: (value) => !isNaN(Number(value)) || "Must be a number"
+                        }}
                         name="reps"
-                        render={({ field: { onChange, value } }) =>
+                        render={({ field: { onChange, value }, fieldState: { error } }) =>
+                            <View style={{ flex: 1 }}>
+                                <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Repetation'}</Text>
                             <TextInput
-                                onChangeText={onChange}
-                                value={value}
-                                style={styles.input}
+                                onChangeText={(text) => onChange(text)}
+                                value={value?.toString()}
+                                style={[styles.input, error && { borderColor: 'red' }]}
                                 placeholder="Repetation"
                             />
+                            {error && <Text style={{ color: 'red', fontSize: 10, height:14}}>{error.message}</Text>}
+                            </View>
                         }
                     />
 
@@ -82,18 +100,20 @@ export default function ExerciseForm({
                         }}
                         name="type"
                         render={({ field: { onChange, value } }) =>
-                            <View style={{flex:1}}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Type'}</Text>
                                 {isSelectionOn ?
                                     <View>
                                         {
                                             selectionItems.map(selection =>
-                                                <PressableText 
+                                                <PressableText
                                                     key={selection}
                                                     text={selection}
                                                     style={styles.selection}
                                                     onPress={() => {
                                                         onChange(selection)
-                                                        setSelectionOn(false)}}/>
+                                                        setSelectionOn(false)
+                                                    }} />
                                             )}
                                     </View> :
                                     <TextInput
@@ -124,7 +144,7 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
         borderRadius: 10,
-        padding: 10,    
+        padding: 10,
         borderColor: '#d0d0d0',
         borderWidth: 1,
         shadowColor: '#65ccf5',
@@ -133,10 +153,9 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 10,
         margin: 1,
-        paddingBottom:20,
+        paddingBottom: 20,
     },
     input: {
-        flex: 1,
         height: 30,
         margin: 2,
         borderWidth: 1,
@@ -146,7 +165,7 @@ const styles = StyleSheet.create({
     rowContainer: {
         flexDirection: 'row',
     },
-    selection:{
+    selection: {
         margin: 2,
         padding: 3,
         alignSelf: "center",
