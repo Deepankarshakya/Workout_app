@@ -17,7 +17,7 @@ type WorkoutProps = {
 };
 
 
-const selectionItems = ["exercise", "break", "streach"]
+const selectionItems = ["exercise", "break", "stretch"]
 
 export default function ExerciseForm({
     onSubmit

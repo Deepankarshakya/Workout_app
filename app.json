@@ -2,6 +2,7 @@
   "expo": {
     "name": "workout-app",
     "slug": "workout-app",
+    "scheme": "workoutapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/app.png",
@@ -25,6 +26,9 @@
     },
     "web": {
       "favicon": "./assets/app.png"
-    }
+    },
+    "plugins": [
+      "expo-web-browser"
+    ]
   }
 }

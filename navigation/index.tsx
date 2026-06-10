@@ -18,6 +18,8 @@ import HistoryScreen from "../screens/HistoryScreen";
 
 import useAuth from "../hooks/useAuth";
 
+import { useDeepLink } from '../hooks/useDeepLink';
+
 export default function Navigation() {
     return (
         <NavigationContainer>
@@ -47,6 +49,7 @@ function AuthNavigator() {
 }
 function RootNavigator() {
     const { user, loading } = useAuth();
+    useDeepLink();
 
     if(loading){
         return null;
