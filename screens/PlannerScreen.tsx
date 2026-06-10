@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, Button, Pressable } from 'react-native';
 import ExerciseForm, { ExerciseFormData } from '../components/ExerciseForm';
 import { SequenceItems, SequenceType, Workout } from '../types/data';
 import slugify from "@sindresorhus/slugify"
@@ -13,8 +13,10 @@ import WorkoutForm, { WorkoutFormData } from '../components/WorkoutForm';
 import { storeWorkout } from '../storage/workout';
 import { supabase } from "../lib/supabase";
 import { saveWorkoutToSupabase } from "../lib/supabaseWorkouts";
+import CustomModal from '../components/styled/modalpopup';
 
 export default function PlannerScreen({ navigation }: any) {
+    const [showExerciseModal, setShowExerciseModal] = useState(false);
     const [seqItems, setSeqItems] = useState<SequenceItems[]>([]);
 
     useFocusEffect(
@@ -42,9 +44,9 @@ export default function PlannerScreen({ navigation }: any) {
     const computeDiff = (exercisesCount: number, workoutDuration: number) => {
 
         const intensity = workoutDuration / exercisesCount;
-        if(intensity <= 60){
+        if (intensity <= 60) {
             return "hard";
-        }else if(intensity <= 100){
+        } else if (intensity <= 100) {
             return "normal";
         }
         else {
@@ -53,39 +55,39 @@ export default function PlannerScreen({ navigation }: any) {
     }
 
     const handelWorkoutSubmit = async (from: WorkoutFormData) => {
-        if(seqItems.length > 0){
+        if (seqItems.length > 0) {
 
             const duration = seqItems.reduce((acc, item) => {
                 return acc + item.duration;
             }, 0)
 
 
-        const workout: Workout = {
-            name : from.name,
-            slug: slugify(from.name + " " + Date.now(), { lowercase: true }),
-            difficulty: computeDiff(seqItems.length, duration),
-            sequence: [...seqItems],
-            duration,
-        }
+            const workout: Workout = {
+                name: from.name,
+                slug: slugify(from.name + " " + Date.now(), { lowercase: true }),
+                difficulty: computeDiff(seqItems.length, duration),
+                sequence: [...seqItems],
+                duration,
+            }
 
-        await storeWorkout(workout);
+            await storeWorkout(workout);
 
-try {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+            try {
+                const {
+                    data: { user },
+                } = await supabase.auth.getUser();
 
-  if (user) {
-    await saveWorkoutToSupabase(
-      user.id,
-      workout
-    );
+                if (user) {
+                    await saveWorkoutToSupabase(
+                        user.id,
+                        workout
+                    );
 
-    console.log("Workout synced");
-  }
-} catch (error) {
-  console.log("Workout sync failed", error);
-}
+                    console.log("Workout synced");
+                }
+            } catch (error) {
+                console.log("Workout sync failed", error);
+            }
         }
 
     }
@@ -93,9 +95,9 @@ try {
 
     return (
         <View style={styles.container}>
-
-            <ExerciseForm
-                onSubmit={handelExerciseSubmit} 
+            <PressableText
+                text="Add Exercise"
+                onPress={() => setShowExerciseModal(true)}
             />
 
             <FlatList
@@ -123,20 +125,42 @@ try {
                             onPress={handelOpen}
                         />
                     }>
-                        { ({handelClose}) => 
-                    <View>
-                        <WorkoutForm
-                            onSubmit={async(data) => {
-                                await handelWorkoutSubmit(data);
-                                handelClose();
-                                navigation.navigate("Home");
-                            }}
-                        />
-                    </View>
+                    {({ handelClose }) =>
+                        <View>
+                            <WorkoutForm
+                                onSubmit={async (data) => {
+                                    await handelWorkoutSubmit(data);
+                                    handelClose();
+                                    navigation.navigate("Home");
+                                }}
+                            />
+                        </View>
 
-                        }
+                    }
 
                 </Modal>
+
+                <CustomModal visible={showExerciseModal} >
+                    <ExerciseForm
+                        onSubmit={(data) => {
+                            handelExerciseSubmit(data);
+                            setShowExerciseModal(false);
+                        }}
+                    />
+
+                    <Pressable
+                        style={styles.close}
+                        onPress={() => setShowExerciseModal(false)}
+                    ><Text style={{
+                        color: 'white',
+                        backgroundColor: 'red', 
+                        fontSize: 20,
+                        paddingLeft: 8,
+                        paddingBottom: 3,
+                        
+                    }}>x</Text></Pressable>
+
+                </CustomModal>
             </View>
         </View>
     )
@@ -146,6 +170,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
-        backgroundColor:'#fff'
+        backgroundColor: '#fff'
+    },
+    close: {
+        position: 'absolute',
+        top: 1,
+        right: 1,
+        width: 25,
     }
 })
