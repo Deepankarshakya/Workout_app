@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { PressableText } from "./styled/Pressable";
+import { Picker } from '@react-native-picker/picker';
 
 export type ExerciseFormData = {
     name: string,
@@ -23,8 +24,9 @@ export default function ExerciseForm({
     onSubmit
 }: WorkoutProps) {
 
-    const { control, handleSubmit } = useForm();
+    const { control, handleSubmit, watch } = useForm();
     const [isSelectionOn, setSelectionOn] = useState(false);
+    const selectedType = watch("type");
 
     return (
         <View style={styles.container}>
@@ -37,13 +39,13 @@ export default function ExerciseForm({
                     name="name"
                     render={({ field: { onChange, value } }) =>
                         <View>
-                        <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Enter Name'}</Text>
-                        <TextInput
-                            onChangeText={onChange}
-                            value={value}
-                            style={styles.input}
-                            placeholder="Name"
-                        />
+                            <Text style={{ fontSize: 12, padding: 5, color: "#0940f3", fontWeight: 'bold' }}>{'Enter Name'}</Text>
+                            <TextInput
+                                onChangeText={onChange}
+                                value={value}
+                                style={styles.input}
+                                placeholder="Name"
+                            />
                         </View>
                     }
                 />
@@ -51,80 +53,88 @@ export default function ExerciseForm({
                 <Controller
                     control={control}
                     rules={{
-                        required: true,
+                        required: "Duration is Required",
                         validate: (value) => !isNaN(Number(value)) || "Must be a number"
                     }}
                     name="duration"
                     render={({ field: { onChange, value }, fieldState: { error } }) =>
                         <View>
-                            <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Duration (seconds)'}</Text>
-                        <TextInput
-                            onChangeText={onChange}
-                            value={value}
-                            style={styles.input}
-                            placeholder="Duration"
-                        />
-                        {error && <Text style={{ color: 'red', fontSize: 10, height:14}}>{error.message}</Text>}
+                            <Text style={{ fontSize: 12, padding: 5, color: "#0940f3", fontWeight: 'bold' }}>{'Duration (seconds)'}</Text>
+                            <TextInput
+                                onChangeText={onChange}
+                                value={value}
+                                style={styles.input}
+                                placeholder="Duration"
+                            />
+                            {error && <Text style={{ color: 'red', fontSize: 10, height: 14 }}>{error.message}</Text>}
                         </View>
                     }
                 />
 
-
-                <Controller
+                {(selectedType === "exercise" || selectedType === "stretch") && (
+                    <Controller
                         control={control}
                         rules={{
-                            required: true,
-                            validate: (value) => !isNaN(Number(value)) || "Must be a number"
+                            required: false,
+                            validate: (value) => {
+                                if (!value) return true;
+                                return !isNaN(Number(value)) || "Must be a number"
+                            }
                         }}
                         name="reps"
                         render={({ field: { onChange, value }, fieldState: { error } }) =>
                             <View>
-                                <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Repetation'}</Text>
-                            <TextInput
-                                onChangeText={(text) => onChange(text)}
-                                value={value?.toString()}
-                                style={[styles.input, error && { borderColor: 'red' }]}
-                                placeholder="Repetation"
-                            />
-                            {error && <Text style={{ color: 'red', fontSize: 10, height:14}}>{error.message}</Text>}
+                                <Text style={{ fontSize: 12, padding: 5, color: "#0940f3", fontWeight: 'bold' }}>{'Repetation'}</Text>
+                                <TextInput
+                                    onChangeText={(text) => onChange(text)}
+                                    value={value?.toString()}
+                                    style={[styles.input, error && { borderColor: 'red' }]}
+                                    placeholder="Repetation"
+                                />
+                                {error && <Text style={{ color: 'red', fontSize: 10, height: 14 }}>{error.message}</Text>}
                             </View>
                         }
                     />
+                )}
 
                 <Controller
                     control={control}
                     rules={{
-                        required: true
+                        required: "Please select a type",
                     }}
                     name="type"
-                    render={({ field: { onChange, value } }) =>
-                        <View style={{ minHeight: 50 }}>
-                            <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Type'}</Text>
-                            {isSelectionOn ?
-                                <View>
-                                    {
-                                        selectionItems.map(selection =>
-                                            <PressableText
-                                                key={selection}
-                                                text={selection}
-                                                style={styles.selection}
-                                                onPress={() => {
-                                                    onChange(selection)
-                                                    setSelectionOn(false)
-                                                }} />
-                                        )}
-                                </View> :
-                                <TextInput
-                                    onFocus={() => setSelectionOn(true)}
-                                    style={styles.input}
-                                    placeholder="Types"
-                                    value={value}
-                                />
-                            }
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <View>
+                            <Text
+                                style={{
+                                    fontSize: 12,
+                                    padding: 5,
+                                    color: "#0940f3",
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                Type
+                            </Text>
 
+                            <View style={styles.pickerContainer}>
+                                <Picker
+                                    selectedValue={value}
+                                    onValueChange={(itemValue) => onChange(itemValue)}
+                                >
+                                    <Picker.Item label="Select Type" value="" />
+                                    <Picker.Item label="Exercise" value="exercise" />
+                                    <Picker.Item label="Break" value="break" />
+                                    <Picker.Item label="Stretch" value="stretch" />
+                                </Picker>
+                            </View>
+
+                            {error && (
+                                <Text style={{ color: "red", fontSize: 10 }}>
+                                    {error.message}
+                                </Text>
+                            )}
                         </View>
-
-                    }
+                    )}
                 />
             </View>
             <View>
@@ -160,5 +170,9 @@ const styles = StyleSheet.create({
         margin: 2,
         padding: 3,
         alignSelf: "center",
-    }
+    },
+    pickerContainer: {
+    borderWidth: 1,
+    borderRadius: 5,
+    },
 })
