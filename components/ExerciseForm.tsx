@@ -36,44 +36,60 @@ export default function ExerciseForm({
                     }}
                     name="name"
                     render={({ field: { onChange, value } }) =>
+                        <View>
+                        <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Enter Name'}</Text>
                         <TextInput
                             onChangeText={onChange}
                             value={value}
                             style={styles.input}
                             placeholder="Name"
                         />
+                        </View>
                     }
                 />
 
                 <Controller
                     control={control}
                     rules={{
-                        required: true
+                        required: true,
+                        validate: (value) => !isNaN(Number(value)) || "Must be a number"
                     }}
                     name="duration"
-                    render={({ field: { onChange, value } }) =>
+                    render={({ field: { onChange, value }, fieldState: { error } }) =>
+                        <View>
+                            <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Duration (seconds)'}</Text>
                         <TextInput
                             onChangeText={onChange}
                             value={value}
                             style={styles.input}
                             placeholder="Duration"
                         />
+                        {error && <Text style={{ color: 'red', fontSize: 10, height:14}}>{error.message}</Text>}
+                        </View>
                     }
                 />
 
 
                 <Controller
-                    control={control}
-                    name="reps"
-                    render={({ field: { onChange, value } }) =>
-                        <TextInput
-                            onChangeText={onChange}
-                            value={value}
-                            style={styles.input}
-                            placeholder="Repetation"
-                        />
-                    }
-                />
+                        control={control}
+                        rules={{
+                            required: true,
+                            validate: (value) => !isNaN(Number(value)) || "Must be a number"
+                        }}
+                        name="reps"
+                        render={({ field: { onChange, value }, fieldState: { error } }) =>
+                            <View>
+                                <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Repetation'}</Text>
+                            <TextInput
+                                onChangeText={(text) => onChange(text)}
+                                value={value?.toString()}
+                                style={[styles.input, error && { borderColor: 'red' }]}
+                                placeholder="Repetation"
+                            />
+                            {error && <Text style={{ color: 'red', fontSize: 10, height:14}}>{error.message}</Text>}
+                            </View>
+                        }
+                    />
 
                 <Controller
                     control={control}
@@ -83,6 +99,7 @@ export default function ExerciseForm({
                     name="type"
                     render={({ field: { onChange, value } }) =>
                         <View style={{ minHeight: 50 }}>
+                            <Text style={{fontSize:12, padding:5, color:"#0940f3", fontWeight:'bold'}}>{'Type'}</Text>
                             {isSelectionOn ?
                                 <View>
                                     {
@@ -125,7 +142,7 @@ export default function ExerciseForm({
 const styles = StyleSheet.create({
     form: {
         display: "flex",
-        gap: 16,
+        gap: 6,
         marginTop: 10,
     },
     container: {
