@@ -1,18 +1,27 @@
 import React, { useState } from 'react';
-import { View,  Alert,  Image } from 'react-native';
+import { View, Alert, Image, ActivityIndicator } from 'react-native';
 import { supabase } from '../lib/supabase';
 import SignupButton from '../components/styled/signupbutton';
 import AuthText from "../components/styled/AuthText";
+import { makeRedirectUri } from 'expo-auth-session';
 
-export default function SignUpScreen({navigation}: any) {
+export default function SignUpScreen({ navigation }: any) {
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const redirectTo = makeRedirectUri();
 
     const signUp = async () => {
         const { error } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+                emailRedirectTo: redirectTo,
+            },
         });
+        setLoading(false);
 
         if (error) {
             Alert.alert(error.message);
@@ -27,14 +36,16 @@ export default function SignUpScreen({navigation}: any) {
         }
     }
     return (
-    <View style={{ padding: 20, backgroundColor:'#fff', flex:1, alignItems:'center'}}>
-      <Image 
-      source={require('../assets/app.png')}
-      style={{          width: 180,
-      height: 180,
-      resizeMode: 'contain',
-      marginBottom: 30,}}
-      />
+        <View style={{ padding: 20, backgroundColor: '#fff', flex: 1, alignItems: 'center' }}>
+            <Image
+                source={require('../assets/app.png')}
+                style={{
+                    width: 180,
+                    height: 180,
+                    resizeMode: 'contain',
+                    marginBottom: 30,
+                }}
+            />
             <AuthText
                 placeholder="Email"
                 value={email}
@@ -47,17 +58,21 @@ export default function SignUpScreen({navigation}: any) {
                 value={password}
                 onChangeText={setPassword}
             />
+            {loading ? (
+                <ActivityIndicator size="large" color='#2563EB' />) : (
+                <>
+                    <SignupButton
+                        text="Sign Up"
+                        onPress={signUp}
+                    />
 
-            <SignupButton
-                text="Sign Up"
-                onPress={signUp}
-            />
-
-            <SignupButton
-                text="Already have an account? Sign In"
-                onPress={() => navigation.replace("SignIn")}
-            />
-
+                    <SignupButton
+                        text="Already have an account? Sign In"
+                        onPress={() => navigation.replace("SignIn")}
+                    />
+                </>
+            )
+            }
         </View>
     );
 }
